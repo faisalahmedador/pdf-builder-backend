@@ -28,7 +28,7 @@ app.use(fileUpload({
 
 app.use('/', indexRouter);
 
-app.listen( 3000, () => {
-    console.log('App listening on port ' +  3000);
+app.listen( 3000, '0.0.0.0', () => {
+    console.log(`Server is running on http://0.0.0.0:3000}`);
 })
 module.exports = app;
