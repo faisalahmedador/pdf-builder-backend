@@ -50,15 +50,19 @@ const generatePdf = async (req, res) => {
         const headerTemplate = handlebars.compile(htmlHeaderTemplate);
         const htmlHeader = headerTemplate(jsonDataFile);
 
-        console.log(htmlFooterTemplate)
         const footerTemplate = handlebars.compile(htmlFooterTemplate);
         const htmlFooter = footerTemplate(jsonDataFile);
-
-        console.log(htmlFooter)
 
         const content = `<style>
                                   body {
                                     margin: 0;
+                                    box-sizing: border-box;
+                                    /*padding: 10px;*/
+                                    
+                                  }
+                                  .page {
+                                    /*background-color: green;*/
+                                    /*page-break-after: always !important;*/
                                   }
                                 </style>
                                 <body>
@@ -67,6 +71,8 @@ const generatePdf = async (req, res) => {
                                   </div>
                                 </body>
                                 `;
+
+
         await page.setContent(content, { waitUntil: [ "load" , "domcontentloaded" , "networkidle0" , "networkidle2"] });
 
         const options = {
@@ -78,49 +84,6 @@ const generatePdf = async (req, res) => {
             format: 'A4',
             margin: margin,
         };
-
-        const adjustForPageBreaks = (margin) => {
-            const pageHeight = document.querySelector('.page').offsetHeight - (parseInt(margin.top) + parseInt(margin.bottom));
-
-            function addPaddingTop(sections) {
-                let cumulativeHeight = 0;
-                sections.forEach((section) => {
-                    cumulativeHeight += section.querySelector('.prescription-content-header').offsetHeight;
-                    const contents = section.querySelectorAll('.prescription-details');
-                    contents.forEach((content) => {
-                        const contentHeight = content.offsetHeight;
-                        // If adding this content exceeds the available height, a page break would occur
-                        if (cumulativeHeight + contentHeight > pageHeight) {
-                            content.style.paddingTop = '20px';
-                            cumulativeHeight = 0; // Reset cumulative height to the current content's height
-                        } else {
-                            cumulativeHeight += contentHeight; // Accumulate the height normally
-                        }
-                    })
-                })
-            }
-
-
-            const prescriptionLeft = document.getElementById('prescription-left');
-            const prescriptionRight = document.getElementById('prescription-right');
-
-            const sectionsLeft = prescriptionLeft.querySelectorAll('.prescription-content-wrapper');
-            addPaddingTop(sectionsLeft);
-
-            const sectionsRight = prescriptionRight.querySelectorAll('.prescription-content-wrapper');
-            addPaddingTop(sectionsRight)
-
-
-
-
-            // Return or log information for debugging
-            return { pageHeight, margin };
-        };
-
-
-        const result = await page.evaluate(adjustForPageBreaks, margin);
-
-        console.log(result);
 
 
         const pdf = await page.pdf(options)
