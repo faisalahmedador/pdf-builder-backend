@@ -19,6 +19,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
+const port = process.env.PORT || 3001;
+
 app.use(fileUpload({
     createParentPath: true,
     limits: {
@@ -28,7 +30,7 @@ app.use(fileUpload({
 
 app.use('/', indexRouter);
 
-app.listen( 3000, () => {
-    console.log(`Server is running on 3000}`);
+app.listen( port, () => {
+    console.log(`Server is running on ${port}`);
 })
 module.exports = app;

@@ -3,6 +3,32 @@ const handlebars = require('handlebars');
 const uuid = require('uuid-random');
 const path = require('path');
 
+
+function wrapHtmlTemplate(htmlTemplate) {
+    return `
+     <html lang="en">
+    <head>
+      <style>
+        @font-face {
+          font-family: 'Noto Sans Bengali';
+          src: url(https://fonts.gstatic.com/s/notosansbengali/v20/Cn-fJsCGWQxOjaGwMQ6fIiMywrNJIky6nvd8BjzVMvJx2mc4I3mYvNY.woff2) format('woff2');
+          font-weight: normal;
+          font-style: normal;
+        }
+        body {
+          font-family: 'Noto Sans Bengali', sans-serif;
+          font-size: 15px;
+        }
+      </style>
+      <title>PDF</title>
+    </head>
+    <body>
+      ${htmlTemplate}
+    </body>
+  </html>
+`;
+}
+
 const generatePdf = async (req, res) => {
     try {
         const templates = req.body.templates;
@@ -54,27 +80,7 @@ const generatePdf = async (req, res) => {
         const footerTemplate = handlebars.compile(htmlFooterTemplate);
         const htmlFooter = footerTemplate(jsonDataFile);
 
-        const content = `<style>
-                                  body {
-                                    margin: 0;
-                                    box-sizing: border-box;
-                                    /*padding: 10px;*/
-                                    
-                                  }
-                                  .page {
-                                    /*background-color: green;*/
-                                    /*page-break-after: always !important;*/
-                                  }
-                                </style>
-                                <body>
-                                  <div class="page">
-                                    ${htmlMain}
-                                  </div>
-                                </body>
-                                `;
-
-
-        await page.setContent(content, { waitUntil: [ "load" , "domcontentloaded" , "networkidle0" , "networkidle2"] });
+        await page.setContent(wrapHtmlTemplate(htmlMain), { waitUntil: [ "load" , "domcontentloaded" , "networkidle0" , "networkidle2"] });
 
         const options = {
             headerTemplate: htmlHeader,
