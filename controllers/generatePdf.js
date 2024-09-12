@@ -60,7 +60,9 @@ const generatePdf = async (req, res) => {
             timeout: 60000
         });
 
+
         const page = await browser.newPage();
+        page.fon
         await page.setJavaScriptEnabled(false);
 
 
